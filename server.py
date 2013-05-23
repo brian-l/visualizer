@@ -27,13 +27,12 @@ class ViewHandler(MethodDispatcher):
 		edges = {}
 		for process in psi.process.ProcessTable().values():
 			user = pwd.getpwuid(process.ruid).pw_name
-			if user == 'brian' or True:
-				if user not in users:
-					users.append(user)
-				if not nodes.get(process.pid):
-					nodes[process.pid] = dict()
-				nodes[process.pid] = {'shape': 'dot', 'label': process.name, 'color': 'red'}
-				edges[process.pid] = {user: {}}
+			if user not in users:
+				users.append(user)
+			if not nodes.get(process.pid):
+				nodes[process.pid] = dict()
+			nodes[process.pid] = {'shape': 'dot', 'label': process.name, 'color': 'red'}
+			edges[process.pid] = {user: {}}
 
 		for user in users:
 			nodes[user] = {'shape': 'dot', 'label': user, 'color': 'blue'}
@@ -45,7 +44,6 @@ class ViewHandler(MethodDispatcher):
 
 worker = tornado.web.Application([
 	(r'/static/js/(.*)', tornado.web.StaticFileHandler, {'path': './static/js'},),
-	# (r'/static/img/(.*)', tornado.web.StaticFileHandler, {'path': './static/img'},),
 	(r'/static/css/(.*)', tornado.web.StaticFileHandler, {'path': './static/css'},),
 	(r'/.*', ViewHandler,),
 ])
@@ -63,9 +61,6 @@ if __name__ == '__main__':
 			time.sleep(2)
 			for process in psi.process.ProcessTable().values():
 				manager.createProcess(Process(process.pid, process.name))
-
-
-	# thread = Thread(target=getProcesses).start()
 
 	try:
 		port = 8080
